@@ -1,5 +1,5 @@
 <template>
-  <form class="form" @submit.prevent="sendForm">
+  <form class="form" ref="form" @submit.prevent="() => sendForm(form)">
     <div class="form__wrapper">
       <h2 class="form__title">Основная информация</h2>
       <div class="form__part">
@@ -214,8 +214,9 @@
 </template>
 
 <script>
-export default {
+ export default {
   name: 'MainForm',
+  props: ['defaultUser'],
   data() {
     return {
       form: {
@@ -295,7 +296,37 @@ export default {
     }
   },
   methods: {
-    sendForm() {
+    sendForm(data) {
+      this.$emit('getData', data);
+      this.$refs.form.reset();
+      this.form = {
+        main: {
+          surname: '',
+          name: '',
+          patronymic: '',
+          dateOfBirth: '',
+          phone: '',
+          gender: '',
+          clientsGroup: [],
+          doctor: 'Врач не назначен',
+          doNotSendSms: false
+        },
+        address: {
+          postcode: '',
+          country: '',
+          area: '',
+          city: '',
+          street: '',
+          home: '',
+        },
+        documents: {
+          type: 'Паспорт',
+          series: '',
+          number: '',
+          pickUpPoint: '',
+          date: '',
+        }
+      }
     }
   }
 }
