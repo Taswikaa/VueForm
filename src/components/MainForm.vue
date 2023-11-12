@@ -1,58 +1,106 @@
 <template>
-  <form class="form">
+  <form class="form" @submit.prevent="sendForm">
     <div class="form__wrapper">
       <h2 class="form__title">Основная информация</h2>
       <div class="form__part">
         <label class="form__field">
           <h4 class="form__field-title form__field-title_mandatory">Фамилия</h4>
-          <input class="form__input" type="text">
+          <input 
+            class="form__input" 
+            type="text"
+            v-model="form.main.surname"
+          >
         </label>
         <label class="form__field">
           <h4 class="form__field-title form__field-title_mandatory">Имя</h4>
-          <input class="form__input" type="text">
+          <input 
+            class="form__input" 
+            type="text"
+            v-model="form.main.name"
+          >
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Отчество</h4>
-          <input class="form__input" type="text">
+          <input
+            class="form__input"
+            type="text"
+            v-model="form.main.patronymic"
+          >
         </label>
         <label class="form__field">
           <h4 class="form__field-title form__field-title_mandatory">Дата рождения</h4>
-          <input class="form__input" type="date">
+          <input 
+            class="form__input" 
+            type="date"
+            v-model="form.main.dateOfBirth"
+          >
         </label>
         <label class="form__field">
           <h4 class="form__field-title form__field-title_mandatory">Номер телефона</h4>
-          <input class="form__input" type="text">
+          <input
+            class="form__input"
+            type="text"
+            v-model="form.main.phone"
+          >
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Пол</h4>
           <div class="form__field_radio">
             <div class="">
-              <input class="form__radio" type="radio" name="gender"> <p>Мужчина</p>
+              <input 
+                class="form__radio" 
+                type="radio" 
+                name="gender"
+                value="Мужчина"
+                v-model="form.main.gender"
+              ><p>Мужчина</p>
             </div>
             <div class="">
-              <input class="form__radio" type="radio" name="gender"> <p>Женщина</p>
+              <input 
+                class="form__radio" 
+                type="radio" 
+                name="gender"
+                value="Женщина"
+                v-model="form.main.gender"
+              ><p>Женщина</p>
             </div>
           </div>
         </label>
         <label class="form__field">
           <h4 class="form__field-title form__field-title_mandatory">Группа клиентов</h4>
-          <select class="form__select" name="" id="" multiple>
-            <option value="">VIP</option>
-            <option value="">Проблемные</option>
-            <option value="">ОМС</option>
+          <select
+            class="form__select"
+            multiple
+            v-model="form.main.clientsGroup"
+          >
+            <option
+              v-for="(type, i) in clientsGroup"
+              :value="type.value"
+              :key="i"
+            >
+              {{ type.label }}
+            </option>
           </select>
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Лечащий врач</h4>
-          <select class="form__select" name="" id="">
-            <option value="">Иванов</option>
-            <option value="">Захаров</option>
-            <option value="">Чернышева</option>
+          <select class="form__select" v-model="form.main.doctor">
+            <option
+              v-for="(doctor, i) in doctors"
+              :value="doctor.value"
+              :key="i"
+            >
+              {{ doctor.label }}
+            </option>
           </select>
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Не отправлять СМС</h4>
-          <input class="form__check" type="checkbox">
+          <input
+            class="form__check"
+            type="checkbox"
+            v-model="form.main.doNotSendSms"
+          >
         </label>
       </div>
     </div>
@@ -61,27 +109,51 @@
       <div class="form__part">
         <label class="form__field">
           <h4 class="form__field-title">Индекс</h4>
-          <input class="form__input" type="text">
+          <input
+            class="form__input"
+            type="text"
+            v-model="form.address.postcode"
+          >
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Страна</h4>
-          <input class="form__input" type="text">
+          <input
+            class="form__input"
+            type="text"
+            v-model="form.address.country"
+          >
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Область</h4>
-          <input class="form__input" type="text">
+          <input
+            class="form__input"
+            type="text"
+            v-model="form.address.area"
+          >
         </label>
         <label class="form__field">
           <h4 class="form__field-title form__field-title_mandatory">Город</h4>
-          <input class="form__input" type="text">
+          <input
+            class="form__input"
+            type="text"
+            v-model="form.address.city"
+          >
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Улица</h4>
-          <input class="form__input" type="text">
+          <input
+            class="form__input"
+            type="text"
+            v-model="form.address.street"
+          >
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Дом</h4>
-          <input class="form__input" type="text">
+          <input
+            class="form__input"
+            type="text"
+            v-model="form.address.home"
+          >
         </label>
       </div>
     </div>
@@ -90,23 +162,50 @@
       <div class="form__part">
         <label class="form__field">
           <h4 class="form__field-title form__field-title_mandatory">Тип документа</h4>
-          <input class="form__input" type="text">
+          <select
+            class="form__select"
+            v-model="form.documents.type"
+          >
+            <option
+              v-for="(type, i) in allowedDocuments"
+              :value="type.value"
+              :key="i"
+            >
+              {{ type.label }}
+            </option>
+          </select>
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Серия</h4>
-          <input class="form__input" type="text">
+          <input
+            class="form__input"
+            type="text"
+            v-model="form.documents.series"
+          >
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Номер</h4>
-          <input class="form__input" type="text">
+          <input
+            class="form__input"
+            type="text"
+            v-model="form.documents.number"
+          >
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Кем выдан</h4>
-          <input class="form__input" type="text">
+          <input
+            class="form__input"
+            type="text"
+            v-model="form.documents.pickUpPoint"
+          >
         </label>
         <label class="form__field">
           <h4 class="form__field-title form__field-title_mandatory">Дата выдачи</h4>
-          <input class="form__input" type="text">
+          <input
+            class="form__input"
+            type="date"
+            v-model="form.documents.date"
+          >
         </label>
       </div>
     </div>
@@ -116,7 +215,89 @@
 
 <script>
 export default {
-  name: 'MainForm'
+  name: 'MainForm',
+  data() {
+    return {
+      form: {
+        main: {
+          surname: '',
+          name: '',
+          patronymic: '',
+          dateOfBirth: '',
+          phone: '',
+          gender: '',
+          clientsGroup: [],
+          doctor: 'Врач не назначен',
+          doNotSendSms: false
+        },
+        address: {
+          postcode: '',
+          country: '',
+          area: '',
+          city: '',
+          street: '',
+          home: '',
+        },
+        documents: {
+          type: 'Паспорт',
+          series: '',
+          number: '',
+          pickUpPoint: '',
+          date: '',
+        }
+      },
+      clientsGroup: [
+        {
+          label: 'VIP',
+          value: 'VIP'
+        },
+        {
+          label: 'Проблемные',
+          value: 'Проблемные'
+        },
+        {
+          label: 'ОМС',
+          value: 'ОМС'
+        },
+      ],
+      doctors: [
+        {
+          label: 'Иванов',
+          value: 'Иванов'
+        },
+        {
+          label: 'Захаров',
+          value: 'Захаров'
+        },
+        {
+          label: 'Чернышёва',
+          value: 'Чернышёва'
+        },
+        {
+          label: 'Врач не назначен',
+          value: 'Врач не назначен'
+        },
+      ],
+      allowedDocuments: [
+        {
+          label: 'Паспорт',
+          value: 'Паспорт'
+        },
+        {
+          label: 'Свидетельство о рождении',
+          value: 'Свидетельство о рождении'
+        },
+        {
+          label: 'Вод. удостоверение',
+          value: 'Вод. удостоверение'
+        },
+      ]
+    }
+  },
+  methods: {
+    sendForm() {
+    }
+  }
 }
 </script>
 
@@ -185,7 +366,7 @@ export default {
     &__select {
       @include basic-input;
       align-self: flex-start;
-      min-width: 13rem;
+      width: 13rem;
     }
 
     &__button {
