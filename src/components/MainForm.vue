@@ -1,5 +1,9 @@
 <template>
-  <form class="form" ref="form" @submit.prevent="() => sendForm(form)">
+  <form
+    class="form"
+    ref="form"
+    @submit.prevent="() => sendForm(form)"
+  >
     <div class="form__wrapper">
       <h2 class="form__title">Основная информация</h2>
       <div class="form__part">
@@ -8,23 +12,40 @@
           <input 
             class="form__input" 
             type="text"
-            v-model="form.main.surname"
+            v-model.trim="form.main.surname"
+            @input="$v.form.main.surname.$touch()"
+            @keydown="(e) => allowOnlyWordInput(e)"
           >
+          <p
+            class="form__error"
+            :class="{'form__error_visible': $v.form.main.surname.$error && $v.form.main.surname.$dirty}"
+          >
+            Обязательное поле
+          </p>
         </label>
         <label class="form__field">
           <h4 class="form__field-title form__field-title_mandatory">Имя</h4>
           <input 
             class="form__input" 
             type="text"
-            v-model="form.main.name"
+            v-model.trim="form.main.name"
+            @input="$v.form.main.name.$touch()"
+            @keydown="(e) => allowOnlyWordInput(e)"
           >
+          <p
+            class="form__error"
+            :class="{'form__error_visible': $v.form.main.name.$error && $v.form.main.name.$dirty}"
+          >
+            Обязательное поле
+          </p>
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Отчество</h4>
           <input
             class="form__input"
             type="text"
-            v-model="form.main.patronymic"
+            v-model.trim="form.main.patronymic"
+            @keydown="(e) => allowOnlyWordInput(e)"
           >
         </label>
         <label class="form__field">
@@ -33,15 +54,39 @@
             class="form__input" 
             type="date"
             v-model="form.main.dateOfBirth"
+            @input="$v.form.main.dateOfBirth.$touch()"
           >
+          <p
+            class="form__error"
+            :class="{'form__error_visible': $v.form.main.dateOfBirth.$error && $v.form.main.dateOfBirth.$dirty}"
+          >
+            Обязательное поле
+          </p>
         </label>
         <label class="form__field">
-          <h4 class="form__field-title form__field-title_mandatory">Номер телефона</h4>
+          <h4 class="form__field-title form__field-title_mandatory form__field-title_phone">Номер телефона</h4>
           <input
-            class="form__input"
+            class="form__input form__input_phone"
             type="text"
+            :maxlength="10"
             v-model="form.main.phone"
+            @input="$v.form.main.phone.$touch()"
+            @keydown="(e) => allowOnlyNumberInput(e)"
           >
+          <p
+            v-if="!$v.form.main.phone.$model.length > 0"
+            class="form__error"
+            :class="{'form__error_visible': $v.form.main.phone.$error && $v.form.main.phone.$dirty}"
+          >
+            Обязательное поле
+          </p>
+          <p
+            v-else
+            class="form__error"
+            :class="{'form__error_visible': $v.form.main.phone.$error}"
+          >
+            Введите номер без 7, 10 цифр
+          </p>
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Пол</h4>
@@ -72,6 +117,7 @@
             class="form__select"
             multiple
             v-model="form.main.clientsGroup"
+            @change="$v.form.main.clientsGroup.$touch()"
           >
             <option
               v-for="(type, i) in clientsGroup"
@@ -81,6 +127,12 @@
               {{ type.label }}
             </option>
           </select>
+          <p
+            class="form__error"
+            :class="{'form__error_visible': $v.form.main.clientsGroup.$error && $v.form.main.clientsGroup.$dirty}"
+          >
+            Обязательное поле
+          </p>
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Лечащий врач</h4>
@@ -112,7 +164,9 @@
           <input
             class="form__input"
             type="text"
+            maxlength="6"
             v-model="form.address.postcode"
+            @keydown="(e) => allowOnlyNumberInput(e)"
           >
         </label>
         <label class="form__field">
@@ -120,7 +174,8 @@
           <input
             class="form__input"
             type="text"
-            v-model="form.address.country"
+            v-model.trim="form.address.country"
+            @keydown="(e) => allowOnlyWordInput(e)"
           >
         </label>
         <label class="form__field">
@@ -128,7 +183,8 @@
           <input
             class="form__input"
             type="text"
-            v-model="form.address.area"
+            v-model.trim="form.address.area"
+            @keydown="(e) => allowOnlyWordInput(e)"
           >
         </label>
         <label class="form__field">
@@ -136,15 +192,24 @@
           <input
             class="form__input"
             type="text"
-            v-model="form.address.city"
+            v-model.trim="form.address.city"
+            @input="$v.form.address.city.$touch()"
+            @keydown="(e) => allowOnlyWordInput(e)"
           >
+          <p
+            class="form__error"
+            :class="{'form__error_visible': $v.form.address.city.$error && $v.form.address.city.$dirty}"
+          >
+            Обязательное поле
+          </p>
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Улица</h4>
           <input
             class="form__input"
             type="text"
-            v-model="form.address.street"
+            v-model.trim="form.address.street"
+            @keydown="(e) => allowOnlyWordInput(e)"
           >
         </label>
         <label class="form__field">
@@ -152,7 +217,7 @@
           <input
             class="form__input"
             type="text"
-            v-model="form.address.home"
+            v-model.trim="form.address.home"
           >
         </label>
       </div>
@@ -174,6 +239,12 @@
               {{ type.label }}
             </option>
           </select>
+          <p
+            class="form__error"
+            :class="{'form__error_visible': $v.form.documents.type.$error && $v.form.documents.type.$dirty}"
+          >
+            Обязательное поле
+          </p>
         </label>
         <label class="form__field">
           <h4 class="form__field-title">Серия</h4>
@@ -181,6 +252,7 @@
             class="form__input"
             type="text"
             v-model="form.documents.series"
+            @keydown="(e) => allowOnlyNumberInput(e)"
           >
         </label>
         <label class="form__field">
@@ -189,6 +261,7 @@
             class="form__input"
             type="text"
             v-model="form.documents.number"
+            @keydown="(e) => allowOnlyNumberInput(e)"
           >
         </label>
         <label class="form__field">
@@ -196,7 +269,8 @@
           <input
             class="form__input"
             type="text"
-            v-model="form.documents.pickUpPoint"
+            v-model.trim="form.documents.pickUpPoint"
+            @keydown="(e) => allowOnlyWordInput(e)"
           >
         </label>
         <label class="form__field">
@@ -204,19 +278,51 @@
           <input
             class="form__input"
             type="date"
+            @input="$v.form.documents.date.$touch()"
             v-model="form.documents.date"
           >
+          <p
+            class="form__error"
+            :class="{'form__error_visible': $v.form.documents.date.$error && $v.form.documents.date.$dirty}"
+          >
+            Обязательное поле
+          </p>
         </label>
       </div>
     </div>
-    <button class="button form__button">Создать</button>
+    <button
+      class="button form__button"
+      :class="{'form__button_disabled' : !$v.form.$anyDirty || $v.form.$anyError }"
+      :disabled="!$v.form.$anyDirty || $v.form.$anyError ? true : false"
+    >Создать</button>
   </form>
 </template>
 
 <script>
+  import { validationMixin } from 'vuelidate'
+  import { required, minLength, maxLength } from 'vuelidate/lib/validators'
+
  export default {
   name: 'MainForm',
-  props: ['defaultUser'],
+  mixins: [validationMixin],
+  validations: {
+    form: {
+      main: {
+        surname: { required },
+        name: { required },
+        dateOfBirth: { required },
+        phone: { required, minLength: minLength(10) },
+        clientsGroup: { required },
+      },
+      address: {
+        city: { required }
+      },
+      documents: {
+        type: { required },
+        date: { required }
+      }
+    }
+  },
   data() {
     return {
       form: {
@@ -296,35 +402,50 @@
     }
   },
   methods: {
+    allowOnlyNumberInput(e) {
+      if (isNaN(e.key) && e.key !== 'Backspace') {
+        e.preventDefault();
+      }
+      if (e.key == ' ') e.preventDefault();
+    },
+    allowOnlyWordInput(e) {
+      if (!isNaN(e.key) && e.key !== 'Backspace' && e.key !== ' ') {
+        e.preventDefault();
+      }
+    },
     sendForm(data) {
-      this.$emit('getData', data);
-      this.$refs.form.reset();
-      this.form = {
-        main: {
-          surname: '',
-          name: '',
-          patronymic: '',
-          dateOfBirth: '',
-          phone: '',
-          gender: '',
-          clientsGroup: [],
-          doctor: 'Врач не назначен',
-          doNotSendSms: false
-        },
-        address: {
-          postcode: '',
-          country: '',
-          area: '',
-          city: '',
-          street: '',
-          home: '',
-        },
-        documents: {
-          type: 'Паспорт',
-          series: '',
-          number: '',
-          pickUpPoint: '',
-          date: '',
+      this.$v.form.$touch()
+      if (!this.$v.form.$error) {
+        this.$emit('getData', data);
+        this.$refs.form.reset();
+        this.$v.form.$reset();
+        this.form = {
+          main: {
+            surname: '',
+            name: '',
+            patronymic: '',
+            dateOfBirth: '',
+            phone: '',
+            gender: '',
+            clientsGroup: [],
+            doctor: 'Врач не назначен',
+            doNotSendSms: false
+          },
+          address: {
+            postcode: '',
+            country: '',
+            area: '',
+            city: '',
+            street: '',
+            home: '',
+          },
+          documents: {
+            type: 'Паспорт',
+            series: '',
+            number: '',
+            pickUpPoint: '',
+            date: '',
+          }
         }
       }
     }
@@ -345,6 +466,16 @@
       font-weight: 500;
       font-size: 1.5rem;
       margin-bottom: 1.5rem;
+    }
+
+    &__error {
+      color: $error-color;
+      align-self: flex-start;
+      display: none;
+
+      &_visible {
+        display: block;
+      }
     }
 
     &__part {
@@ -381,11 +512,28 @@
       &_mandatory {
         font-weight: 700;
       }
+
+      &_phone {
+        &::after {
+          content: '+7';
+          position: absolute;
+          padding: 0.25rem;
+          top: 1.9rem;
+          left: 0;
+          font-size: 1.1rem;
+          opacity: .7;
+        }
+      }
     }
 
     &__input {
       @include basic-input;
       align-self: flex-start;
+
+      &_phone {
+        max-width: 205px;
+        padding-left: 2rem;
+      }
     }
 
     &__check {
@@ -403,6 +551,11 @@
     &__button {
       min-width: 13rem;
       margin-top: 0.5rem;
+
+      &_disabled {
+        opacity: .5;
+        color: #000;
+      }
     }
   }
 
@@ -441,6 +594,10 @@
         left: 50%;
         cursor: pointer;
         margin: 0;
+
+        &_disabled {
+          cursor: default;
+        }
       }
     }
   }
